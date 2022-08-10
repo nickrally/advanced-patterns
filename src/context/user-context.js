@@ -6,47 +6,48 @@ import * as Client from "../client/client";
 const UserContext = React.createContext();
 UserContext.displayName = "UserContext";
 
-export const UserProvider = ({ children, formState }) => {
-  function reducerFunc(state, action) {
-    const { type, payload, updatedUser, error } = action;
-    switch (type) {
-      case "start update": {
-        return {
-          ...state,
-          user: { ...state.user, ...payload },
-          status: "pending",
-          storedUser: state.user,
-        };
-      }
-      case "finish update": {
-        return {
-          ...state,
-          user: updatedUser,
-          status: "resolved",
-          storedUser: null,
-          error: null,
-        };
-      }
-      case "fail update": {
-        return {
-          ...state,
-          status: "rejected",
-          error,
-          user: state.storedUser,
-          storedUser: null,
-        };
-      }
-      case "reset": {
-        return {
-          ...state,
-          status: null,
-          error: null,
-        };
-      }
-      default:
-        throw new Error(`Unknown action type: ${type} `);
+function reducerFunc(state, action) {
+  const { type, payload, updatedUser, error } = action;
+  switch (type) {
+    case "start update": {
+      return {
+        ...state,
+        user: { ...state.user, ...payload },
+        status: "pending",
+        storedUser: state.user,
+      };
     }
+    case "finish update": {
+      return {
+        ...state,
+        user: updatedUser,
+        status: "resolved",
+        storedUser: null,
+        error: null,
+      };
+    }
+    case "fail update": {
+      return {
+        ...state,
+        status: "rejected",
+        error,
+        user: state.storedUser,
+        storedUser: null,
+      };
+    }
+    case "reset": {
+      return {
+        ...state,
+        status: null,
+        error: null,
+      };
+    }
+    default:
+      throw new Error(`Unknown action type: ${type} `);
   }
+}
+
+export const UserProvider = ({ children, formState }) => {
   const { user } = useAuth();
 
   const [state, dispatch] = React.useReducer(reducerFunc, {
